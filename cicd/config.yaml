@@ -1,0 +1,11 @@
+min_score: 51
+required_checks:
+  - name: Frozen-Deps
+    confidence: 5
+  - name: Active
+  - name: Branch-Protection
+    confidence: 10
+ignore_dependencies:
+  - github.com/google/renameio
+  - github.com/stretchr/testify
+  - github.com/rogpeppe/go-internal

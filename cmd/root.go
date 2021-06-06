@@ -268,6 +268,29 @@ func fetchGitRepositoryFromRubyGems(packageName string) (string, error) {
 	return v.SourceCodeURI, nil
 }
 
+// Gets the GitHub repository URL for the Go module.
+func FetchGitRepositoryFromGoMod(moduleName string) (string, error) {
+	goModSearchURL := "https://%s?go-get=1"
+	const timeout = 10
+	client := &http.Client{
+		Timeout: timeout * time.Second,
+	}
+	resp, err := client.Get(fmt.Sprintf(goModSearchURL, moduleName))
+	if err != nil {
+		return "", fmt.Errorf("failed to go module data: %w", err)
+	}
+
+	defer resp.Body.Close()
+	sourceURI, err := parseMetaGoImports(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	if sourceURI == "" {
+		return "", fmt.Errorf("could not find source repo for go module: %s", moduleName)
+	}
+	return sourceURI, nil
+}
+
 //nolint:gochecknoinits
 func init() {
 	// Add the zap flag manually
