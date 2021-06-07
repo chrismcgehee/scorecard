@@ -30,6 +30,7 @@ type RepoResult struct {
 	Date     string
 	Checks   []checker.CheckResult
 	Metadata []string
+	Score    int
 }
 
 // AsJSON outputs the result in JSON format with a newline at the end.

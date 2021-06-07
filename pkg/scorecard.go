@@ -72,8 +72,20 @@ func RunScorecards(ctx context.Context,
 	go runEnabledChecks(ctx, repo, checksToRun,
 		httpClient, githubClient, graphClient,
 		resultsCh)
+	
+	pass := 0
 	for result := range resultsCh {
 		ret.Checks = append(ret.Checks, result)
+		// calculates the score based on results that were run.
+		// simple check for now to get the result.
+		// The score calculation will be based on tiers when it is decided.
+		if result.Pass {
+			pass++
+		}
+	}
+	const hundred int = 100
+	if len(ret.Checks) > 0 {
+		ret.Score = (hundred * pass) / len(ret.Checks)
 	}
 	return ret
 }

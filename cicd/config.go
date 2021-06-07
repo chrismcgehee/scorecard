@@ -17,7 +17,7 @@ type ConfigOptions struct {
 
 func readConfig() (ConfigOptions, error) {
 	var options ConfigOptions
-	fileContents, err := os.ReadFile("./config.yaml")
+	fileContents, err := os.ReadFile("/home/chris/code/ossf/scorecard/cicd/config.yaml")
 	if err != nil {
 		return options, err
 	}
