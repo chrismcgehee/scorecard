@@ -20,7 +20,7 @@ require (
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a // indirect
 	github.com/spf13/cobra v1.1.3
 	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.16.0
+	go.uber.org/zap v1.18.1
 	gocloud.dev v0.22.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
