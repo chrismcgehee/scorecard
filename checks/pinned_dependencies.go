@@ -370,14 +370,14 @@ func validateDockerfileIsPinned(pathfn string, content []byte,
 
 			// Not pinned.
 			ret = false
-			dl.Warn("unpinned dependency detected in %v: '%v'", pathfn, name)
+			dl.Warn("unpinned dependency detected in %v line %d: '%v'", pathfn, child.StartLine, name)
 
 		// FROM name.
 		case len(valueList) == 1:
 			name := valueList[0]
 			if !regex.Match([]byte(name)) {
 				ret = false
-				dl.Warn("unpinned dependency detected in %v: '%v'", pathfn, name)
+				dl.Warn("unpinned dependency detected in %v: '%v'", pathfn, pathfn, child.StartLine, name)
 			}
 
 		default:
@@ -528,7 +528,7 @@ func validateGitHubActionWorkflow(pathfn string, content []byte,
 				match := hashRegex.Match([]byte(step.Uses))
 				if !match {
 					ret = false
-					dl.Warn("unpinned dependency detected in %v: '%v' (job '%v')", pathfn, step.Uses, jobName)
+					dl.Warn("unpinned dependency detected in %v line %d: '%v' (job '%v')", pathfn, step.Uses, jobName)
 				}
 			}
 		}

@@ -310,7 +310,7 @@ func isFetchPipeExecute(node syntax.Node, cmd, pathfn string,
 		return false
 	}
 
-	dl.Warn("insecure (unpinned) download detected in %v: '%v'", pathfn, cmd)
+	warnUnpinnedDownload(node, cmd, pathfn, dl)
 	return true
 }
 
@@ -350,7 +350,7 @@ func isExecuteFiles(node syntax.Node, cmd, pathfn string, files map[string]bool,
 	ok = false
 	for fn := range files {
 		if isInterpreterWithFile(c, fn) || isExecuteFile(c, fn) {
-			dl.Warn("insecure (unpinned) download detected in %v: '%v'", pathfn, cmd)
+			warnUnpinnedDownload(node, cmd, pathfn, dl)
 			ok = true
 		}
 	}
@@ -505,13 +505,13 @@ func isUnpinnedPakageManagerDownload(node syntax.Node, cmd, pathfn string,
 
 	// Go get/install.
 	if isGoUnpinnedDownload(c) {
-		dl.Warn("insecure (unpinned) download detected in %v: '%v'", pathfn, cmd)
+		warnUnpinnedDownload(node, cmd, pathfn, dl)
 		return true
 	}
 
 	// Pip install.
 	if isPipUnpinnedDownload(c) {
-		dl.Warn("insecure (unpinned) download detected in %v: '%v'", pathfn, cmd)
+		warnUnpinnedDownload(node, cmd, pathfn, dl)
 		return true
 	}
 
@@ -594,7 +594,7 @@ func isFetchProcSubsExecute(node syntax.Node, cmd, pathfn string,
 		return false
 	}
 
-	dl.Warn("insecure (unpinned) download detected in %v: '%v'", pathfn, cmd)
+	warnUnpinnedDownload(node, cmd, pathfn, dl)
 	return true
 }
 
@@ -815,4 +815,8 @@ func validateShellFile(pathfn string, content []byte, dl checker.DetailLogger) (
 		dl.Debug(err.Error())
 	}
 	return r, err
+}
+
+func warnUnpinnedDownload(node syntax.Node, cmd, pathfn string,	dl checker.DetailLogger) {
+	dl.Warn("insecure (unpinned) download detected in %v line %d: '%v'", pathfn, node.Pos().Line(), cmd)
 }
