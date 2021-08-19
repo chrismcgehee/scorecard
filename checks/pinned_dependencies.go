@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/ossf/scorecard/v2/checker"
 	sce "github.com/ossf/scorecard/v2/errors"
@@ -33,23 +33,54 @@ const CheckPinnedDependencies = "Pinned-Dependencies"
 // We only declare the fields we need.
 // Github workflows format: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
 type gitHubActionWorkflowConfig struct {
-	// nolint: govet
-	Jobs map[string]struct {
-		Name  string `yaml:"name"`
-		Steps []struct {
-			Name  string `yaml:"name"`
-			ID    string `yaml:"id"`
-			Uses  string `yaml:"uses"`
-			Shell string `yaml:"shell"`
-			Run   string `yaml:"run"`
-		}
-		Defaults struct {
-			Run struct {
-				Shell string `yaml:"shell"`
-			} `yaml:"run"`
-		} `yaml:"defaults"`
-	}
+	Jobs map[string]gitHubActionWorkflowJob
 	Name string `yaml:"name"`
+}
+
+// Structure for workflow config.
+// We only declare the fields we need.
+// Github workflows format: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+type gitHubActionWorkflowJob struct {
+	Name  string `yaml:"name"`
+	Steps []struct {
+		Name  string `yaml:"name"`
+		ID    string `yaml:"id"`
+		Uses  string `yaml:"uses"`
+		Shell string `yaml:"shell"`
+		Run   string `yaml:"run"`
+	}
+	Defaults struct {
+		Run struct {
+			Shell string `yaml:"shell"`
+		} `yaml:"run"`
+	} `yaml:"defaults"`
+	RunsOn   stringSlice `yaml:"runs-on"`
+	Strategy struct {
+		Matrix struct {
+			Os []string `yaml:"os"`
+		} `yaml:"matrix"`
+	} `yaml:"strategy"`
+}
+
+// stringSlice is for fields that can be a single string or a slice of strings. If the field is a single string, 
+// this value will be a slice with a single string item.
+type stringSlice []string
+
+func (s *stringSlice) UnmarshalYAML(value *yaml.Node) error {
+	var stringSlice []string
+	err := value.Decode(&stringSlice)
+	if err != nil {
+		var single string
+		err := value.Decode(&single)
+		if err != nil {
+			//nolint:wrapcheck
+			return sce.Create(sce.ErrScorecardInternal, fmt.Sprintf("error decoding stringWithLine Value: %v", err))
+		}
+		*s = []string{single}
+	} else {
+		*s = stringSlice
+	}
+	return nil
 }
 
 //nolint:gochecknoinits
@@ -416,6 +447,24 @@ func testValidateGitHubWorkflowScriptFreeOfInsecureDownloads(pathfn string,
 	return createReturnForIsGitHubWorkflowScriptFreeOfInsecureDownloads(r, dl, err)
 }
 
+// // Has at least 1 Windows OS that this job runs on
+// func runsOnWindows(job gitHubActionWorkflowJob) bool {
+// 	if strings.Contains(job.RunsOn, "matrix.os") {
+// 		for _, os := range job.Strategy.Matrix.Os {
+// 			if strings.HasPrefix(strings.ToLower(os), "windows-") {
+// 				return true
+// 			}
+// 		}
+// 	}
+
+// 	return false
+// }
+
+// // The only OS that this job runs on is Windows
+// func alwaysRunsOnWindows(job gitHubActionWorkflowJob) bool {
+// 	return true
+// }
+
 func validateGitHubWorkflowIsFreeOfInsecureDownloads(pathfn string, content []byte,
 	dl checker.DetailLogger, data FileCbData) (bool, error) {
 	pdata := dataAsResultPointer(data)
@@ -439,6 +488,7 @@ func validateGitHubWorkflowIsFreeOfInsecureDownloads(pathfn string, content []by
 	defaultShell := "bash"
 	scriptContent := ""
 	for _, job := range workflow.Jobs {
+		fmt.Println("runs-on", job.RunsOn)
 		if job.Defaults.Run.Shell != "" {
 			defaultShell = job.Defaults.Run.Shell
 		}
