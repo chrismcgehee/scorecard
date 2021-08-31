@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v32 v32.1.0
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
-	github.com/jszwec/csvutil v1.5.0
+	github.com/jszwec/csvutil v1.5.1
 	github.com/moby/buildkit v0.8.3
 	github.com/naveensrinivasan/httpcache v1.2.2
 	github.com/onsi/ginkgo v1.16.2
