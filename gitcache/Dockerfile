@@ -14,7 +14,7 @@
 
 # syntax = docker/dockerfile:1-experimental
 
-FROM  golang:1.16.4@sha256:6f0b0a314b158ff6caf8f12d7f6f3a966500ec6afb533e986eca7375e2f7560f AS base
+FROM  golang:1.17.3@sha256:4eab694fe28880afaa10c436f8b726224580149e07c4f9c4cfeaa618b8ee0736 AS base
 WORKDIR /src
 ENV CGO_ENABLED=0
 COPY go.* ./
