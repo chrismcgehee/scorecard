@@ -52,7 +52,7 @@ type artifactLocation struct {
 }
 
 type physicalLocation struct {
-	Region           region           `json:"region"`
+	Region           region           `json:"region,omitempty"`
 	ArtifactLocation artifactLocation `json:"artifactLocation"`
 }
 
@@ -318,18 +318,18 @@ func addDefaultLocation(locs []location, policyFile string) []location {
 		return locs
 	}
 
-	detaultLine := 1
+	// detaultLine := 1
 	loc := location{
 		PhysicalLocation: physicalLocation{
 			ArtifactLocation: artifactLocation{
 				URI:       policyFile,
 				URIBaseID: "%SRCROOT%",
 			},
-			Region: region{
-				// TODO: set the line to the check if it's overwritten,
-				// or to the global policy.
-				StartLine: &detaultLine,
-			},
+			// Region: region{
+			// 	// TODO: set the line to the check if it's overwritten,
+			// 	// or to the global policy.
+			// 	StartLine: &detaultLine,
+			// },
 		},
 	}
 	locs = append(locs, loc)

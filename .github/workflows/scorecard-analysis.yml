@@ -19,15 +19,13 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
-
-      - name: "Run analysis"
-        # TODO: pin our action.
-        uses: ossf/scorecard-actions/analyze@test/dogfood
-        with:
-          policy_file: .github/scorecard-policy.yml
-          results_file: results.sarif
-          results_format: sarif
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: build
+        run: make build-scorecard
+      - name: Run analysis
+        run: ./scorecard --repo=chrismcgehee/test-scorecard --checks=Token-Permissions --format=sarif --policy=.github/scorecard-policy.yml > results.sarif
+        env:
+          GITHUB_AUTH_TOKEN: secrets.GITHUB_TOKEN
+          SCORECARD_V4: 1
 
       # https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
       # Optional.
