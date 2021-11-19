@@ -1,0 +1,73 @@
+{
+   "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+   "version": "2.1.0",
+   "runs": [
+      {
+         "automationDetails": {
+            "id": "supply-chain/local/08a78762da5a040c137ba9d2b4d34e2a2a3659d1-19 Nov 21 07:45 -0800"
+         },
+         "tool": {
+            "driver": {
+               "name": "Scorecard",
+               "informationUri": "https://github.com/ossf/scorecard",
+               "semanticVersion": "3.1.1-74-g08a7876-dirty",
+               "rules": [
+                  {
+                     "id": "Token-Permissions",
+                     "name": "Token-Permissions",
+                     "helpUri": "https://github.com/ossf/scorecard/blob/08a78762da5a040c137ba9d2b4d34e2a2a3659d1/docs/checks.md#token-permissions",
+                     "shortDescription": {
+                        "text": "Token-Permissions"
+                     },
+                     "fullDescription": {
+                        "text": "Determines if the project's workflows follow the principle of least privilege."
+                     },
+                     "help": {
+                        "text": "Determines if the project's workflows follow the principle of least privilege.",
+                        "markdown": "**Remediation**:\n\n- Set permissions as `read-all` or `contents: read` as described in GitHub's [documentation](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions).\n\n\n\n**Severity**: High\n\n\n\n**Details**:\n\nRisk: `High` (vulnerable to malicious code additions)\n\n\n\nThis check determines whether the project's automated workflows tokens are set\n\nto read-only by default. It is currently limited to repositories hosted on\n\nGitHub, and does not support other source hosting repositories (i.e., Forges).\n\n\n\nSetting token permissions to read-only follows the principle of least privilege.\n\nThis is important because attackers may use a compromised token with write\n\naccess to push malicious code into the project.\n\n\n\nThe highest score is awarded when the permissions definitions in each workflow's\n\nyaml file are set as read-only at the\n\n[top level](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions)\n\nand the required write permissions are declared at the\n\n[run-level](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions).\n\n        \n\nThe check cannot detect if the \"read-only\" GitHub permission setting is\n\nenabled, as there is no API available.   \n\n"
+                     },
+                     "defaultConfiguration": {
+                        "level": "error"
+                     },
+                     "properties": {
+                        "precision": "high",
+                        "problem.severity": "error",
+                        "security-severity": "7.0",
+                        "tags": [
+                           "supply-chain",
+                           "security",
+                           "infrastructure"
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "results": [
+            {
+               "ruleId": "Token-Permissions",
+               "ruleIndex": 0,
+               "message": {
+                  "text": "no permission defined"
+               },
+               "locations": [
+                  {
+                     "physicalLocation": {
+                        "region": {
+                           "startLine": 1
+                        },
+                        "artifactLocation": {
+                           "uri": ".github/workflows/test2.yml",
+                           "uriBaseId": "%SRCROOT%"
+                        }
+                     },
+                     "message": {
+                        "text": "no permission defined"
+                     }
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}
