@@ -52,7 +52,7 @@ type artifactLocation struct {
 }
 
 type physicalLocation struct {
-	Region           region           `json:"region,omitempty"`
+	// Region           region           `json:"region,omitempty"`
 	ArtifactLocation artifactLocation `json:"artifactLocation"`
 }
 
@@ -303,7 +303,7 @@ func detailsToLocations(details []checker.CheckDetail,
 		}
 
 		// Set the region depending on the file type.
-		loc.PhysicalLocation.Region = detailToRegion(&d)
+		// loc.PhysicalLocation.Region = detailToRegion(&d)
 		locs = append(locs, loc)
 	}
 

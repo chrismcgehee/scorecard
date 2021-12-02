@@ -4,18 +4,18 @@
    "runs": [
       {
          "automationDetails": {
-            "id": "supply-chain/local/d956250910a101673ed5daf2f3502dd2b2ab3dd3-01 Dec 21 19:50 -0800"
+            "id": "supply-chain/local/eb448e924a8d547194245827aa9b0006d23b9a41-01 Dec 21 19:58 -0800"
          },
          "tool": {
             "driver": {
                "name": "Scorecard",
                "informationUri": "https://github.com/ossf/scorecard",
-               "semanticVersion": "3.1.1-81-gd956250-dirty",
+               "semanticVersion": "3.1.1-82-geb448e9-dirty",
                "rules": [
                   {
                      "id": "Token-Permissions",
                      "name": "Token-Permissions",
-                     "helpUri": "https://github.com/ossf/scorecard/blob/d956250910a101673ed5daf2f3502dd2b2ab3dd3/docs/checks.md#token-permissions",
+                     "helpUri": "https://github.com/ossf/scorecard/blob/eb448e924a8d547194245827aa9b0006d23b9a41/docs/checks.md#token-permissions",
                      "shortDescription": {
                         "text": "Token-Permissions"
                      },
@@ -53,7 +53,6 @@
                "locations": [
                   {
                      "physicalLocation": {
-                        "region": {},
                         "artifactLocation": {
                            "uri": ".github/scorecard-policy.yml",
                            "uriBaseId": "%SRCROOT%"
