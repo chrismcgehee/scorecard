@@ -19,19 +19,6 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
-      # - uses: actions/setup-go@331ce1d993939866bb63c32c6cbbfd48fa76fc57 # v2.1.3
-      #   with:
-      #     go-version: '1.17'
-      # - name: build
-      #   run: make build-scorecard
-      # - name: Run analysis
-      #   run: ./scorecard --repo=chrismcgehee/test-scorecard --checks=Token-Permissions --format=sarif --policy=.github/scorecard-policy.yml > results.sarif
-      #   env:
-      #     GITHUB_AUTH_TOKEN: secrets.GITHUB_TOKEN
-      #     SCORECARD_V4: 1
-
-      # https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
-      # Optional.
       - name: "Upload artifact"
         uses: actions/upload-artifact@v2
         with:

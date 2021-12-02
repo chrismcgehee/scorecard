@@ -4,18 +4,18 @@
    "runs": [
       {
          "automationDetails": {
-            "id": "supply-chain/local/08a78762da5a040c137ba9d2b4d34e2a2a3659d1-19 Nov 21 07:45 -0800"
+            "id": "supply-chain/local/27701a7d80ba63f6acc1735af87d9b713845b753-01 Dec 21 19:45 -0800"
          },
          "tool": {
             "driver": {
                "name": "Scorecard",
                "informationUri": "https://github.com/ossf/scorecard",
-               "semanticVersion": "3.1.1-74-g08a7876-dirty",
+               "semanticVersion": "3.1.1-80-g27701a7",
                "rules": [
                   {
                      "id": "Token-Permissions",
                      "name": "Token-Permissions",
-                     "helpUri": "https://github.com/ossf/scorecard/blob/08a78762da5a040c137ba9d2b4d34e2a2a3659d1/docs/checks.md#token-permissions",
+                     "helpUri": "https://github.com/ossf/scorecard/blob/27701a7d80ba63f6acc1735af87d9b713845b753/docs/checks.md#token-permissions",
                      "shortDescription": {
                         "text": "Token-Permissions"
                      },
@@ -48,7 +48,7 @@
                "ruleId": "Token-Permissions",
                "ruleIndex": 0,
                "message": {
-                  "text": "no permission defined"
+                  "text": "non read-only tokens detected in GitHub workflows"
                },
                "locations": [
                   {
@@ -57,12 +57,9 @@
                            "startLine": 1
                         },
                         "artifactLocation": {
-                           "uri": ".github/workflows/test2.yml",
+                           "uri": ".github/scorecard-policy.yml",
                            "uriBaseId": "%SRCROOT%"
                         }
-                     },
-                     "message": {
-                        "text": "no permission defined"
                      }
                   }
                ]
