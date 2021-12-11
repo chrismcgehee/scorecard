@@ -22,6 +22,7 @@ import (
 
 	"github.com/rhysd/actionlint"
 
+	"github.com/ossf/scorecard/v3/checker"
 	sce "github.com/ossf/scorecard/v3/errors"
 )
 
@@ -57,6 +58,50 @@ func IsStepExecKind(step *actionlint.Step, kind actionlint.ExecKind) bool {
 		return false
 	}
 	return step.Exec.Kind() == kind
+}
+
+// GetLineNumber returns the line number for this position.
+func GetLineNumber(pos *actionlint.Pos) int {
+	if pos == nil {
+		return checker.OffsetDefault
+	}
+	return pos.Line
+}
+
+// GetUses returns the 'uses' statement in this step or nil if this step does not have one.
+func GetUses(step *actionlint.Step) *actionlint.String {
+	if step == nil {
+		return nil
+	}
+	if !IsStepExecKind(step, actionlint.ExecKindAction) {
+		return nil
+	}
+	execAction, ok := step.Exec.(*actionlint.ExecAction)
+	if !ok {
+		return nil
+	}
+	if execAction == nil {
+		return nil
+	}
+	return execAction.Uses
+}
+
+// GetWith returns the 'with' statement in this step or nil if this step does not have one.
+func GetWith(step *actionlint.Step) map[string]*actionlint.Input {
+	if step == nil {
+		return nil
+	}
+	if !IsStepExecKind(step, actionlint.ExecKindAction) {
+		return nil
+	}
+	execAction, ok := step.Exec.(*actionlint.ExecAction)
+	if !ok {
+		return nil
+	}
+	if execAction == nil {
+		return nil
+	}
+	return execAction.Inputs
 }
 
 func getExecRunShell(execRun *actionlint.ExecRun) string {

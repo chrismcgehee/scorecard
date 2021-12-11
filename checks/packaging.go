@@ -21,7 +21,9 @@ import (
 	"strings"
 
 	"github.com/ossf/scorecard/v3/checker"
+	"github.com/ossf/scorecard/v3/checks/fileparser"
 	sce "github.com/ossf/scorecard/v3/errors"
+	"github.com/rhysd/actionlint"
 )
 
 // CheckPackaging is the registered name for Packaging.
@@ -51,7 +53,12 @@ func Packaging(c *checker.CheckRequest) checker.CheckResult {
 			return checker.CreateRuntimeErrorResult(CheckPackaging, e)
 		}
 
-		if !isPackagingWorkflow(string(fc), fp, c.Dlogger) {
+		workflow, errs := actionlint.Parse(fc)
+		if len(errs) > 0 && workflow == nil {
+			e := fileparser.FormatActionlintError(errs)
+			return checker.CreateRuntimeErrorResult(CheckPackaging, e)
+		}
+		if !isPackagingWorkflow(workflow, fp, c.Dlogger) {
 			continue
 		}
 
@@ -86,8 +93,141 @@ func Packaging(c *checker.CheckRequest) checker.CheckResult {
 		"no published package detected")
 }
 
+type JobMatcher struct {
+	uses    []string
+	with    []map[string]string
+	runs    []string
+	logText string
+}
+
+func (m *JobMatcher) Matches(job *actionlint.Job) (bool, error) {
+
+	usesNeedingMatch := m.uses
+	runsNeedingMatch := m.runs
+
+	for _, step := range job.Steps {
+		uses := fileparser.GetUses(step)
+		if uses != nil {
+			for i, needingMatch := range usesNeedingMatch {
+				if !strings.HasPrefix(uses.Value, needingMatch + "@") {
+					continue
+				}
+				if m.with != nil {
+					with := fileparser.GetWith(step)
+					if with == nil {
+						continue
+					}
+					val, ok := with.Value[m.with[i]["key"]]
+				}
+				// remove the match from the list
+				usesNeedingMatch = append(usesNeedingMatch[:i], usesNeedingMatch[i+1:]...)
+				break
+			}
+		}
+	}
+}
+
 // A packaging workflow.
-func isPackagingWorkflow(s, fp string, dl checker.DetailLogger) bool {
+func isPackagingWorkflow(workflow *actionlint.Workflow, fp string, dl checker.DetailLogger) (bool, error) {
+	jobMatchers := []JobMatcher{
+		JobMatcher{
+			uses: []string {
+				"actions/setup-node",
+			},
+			with: []map[string]string{
+				{"registry-url": "https://registry.npmjs.org"},
+			},
+			runs: []string{
+				"npm.*publish",
+			},
+			logText: "candidate node publishing workflow using npm",
+		},
+		JobMatcher{
+			uses: []string {
+				"actions/setup-java",
+			},
+			runs: []string{
+				"mvn.*deploy",
+			},
+			logText: "candidate java publishing workflow using maven",
+		},
+		JobMatcher{
+			uses: []string {
+				"actions/setup-java",
+			},
+			runs: []string{
+				"gradle.*publish",
+			},
+			logText: "candidate java publishing workflow using gradle",
+		},
+		JobMatcher{
+			runs: []string{
+				"gem.*push",
+			},
+			logText: "candidate ruby publishing workflow using gem",
+		},
+		JobMatcher{
+			runs: []string{
+				"nuget.*push",
+			},
+			logText: "candidate nuget publishing workflow",
+		},
+		JobMatcher{
+			runs: []string{
+				"docker.*push",
+			},
+			logText: "candidate docker publishing workflow",
+		},
+		JobMatcher{
+			uses: []string{
+				"docker/build-push-action",
+			},
+			logText: "candidate docker publishing workflow",
+		},
+		JobMatcher{
+			uses: []string{
+				"actions/setup-python",
+				"pypa/gh-action-pypi-publish",
+			},
+			logText: "candidate python publishing workflow using pypi",
+		},
+		JobMatcher{
+			uses: []string{
+				"actions/setup-go",
+				"goreleaser/goreleaser-action",
+			},
+			logText: "candidate golang publishing workflow",
+		},
+		JobMatcher{
+			runs: []string{
+				"cargo.*publish",
+			},
+			logText: "candidate rust publishing workflow using cargo",
+		},
+	}
+
+	for _, job := range workflow.Jobs {
+		for _, matcher := range jobMatchers {
+			isMatch, err := matcher.Matches(job)
+			if err != nil {
+				return false, err
+			}
+			if !isMatch {
+				continue
+			}
+
+			dl.Info3(&checker.LogMessage{
+				Path:   fp,
+				Type:   checker.FileTypeSource,
+				Offset: fileparser.GetLineNumber(job.Pos),
+				Text:   matcher.logText,
+			})
+			return true, nil
+		}
+	}
+
+
+
 	// Nodejs packages.
 	if strings.Contains(s, "actions/setup-node@") {
 		r1 := regexp.MustCompile(`(?s)registry-url.*https://registry\.npmjs\.org`)
