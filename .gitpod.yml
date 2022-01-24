@@ -1,0 +1,8 @@
+
+tasks:
+  - init: |-
+      make install
+      make build-scorecard
+vscode:
+  extensions:
+    - golang.go
