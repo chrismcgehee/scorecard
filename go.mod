@@ -16,7 +16,7 @@ require (
 	github.com/google/go-github/v38 v38.1.0
 	github.com/h2non/filetype v1.1.3
 	github.com/jszwec/csvutil v1.6.0
-	github.com/moby/buildkit v0.8.3
+	github.com/moby/buildkit v0.9.3
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
