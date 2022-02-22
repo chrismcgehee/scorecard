@@ -185,6 +185,7 @@ func (handler *tarballHandler) extractTarball() error {
 					return fmt.Errorf("os.Mkdir: %w", err)
 				}
 			}
+			
 			outFile, err := os.Create(filenamepath)
 			if err != nil {
 				return fmt.Errorf("os.Create: %w", err)
@@ -237,5 +238,21 @@ func (handler *tarballHandler) cleanup() error {
 	}
 	// Remove old files so we don't iterate through them.
 	handler.files = nil
+	return nil
+}
+
+func DownloadRepoContents(ctx context.Context, inputRepo clients.Repo, commitSHA, downloadPath string) error {
+	repo, _, err := client.repoClient.Repositories.Get(client.ctx, ghRepo.owner, ghRepo.repo)
+	if err != nil {
+		return sce.WithMessage(sce.ErrRepoUnreachable, err.Error())
+	}
+	handler := &tarballHandler{}
+
+	if err := handler.init(ctx, repo, commitSHA); err != nil {
+		return err
+	}
+	if err := handler.extractTarball(); err != nil {
+		return err
+	}
 	return nil
 }

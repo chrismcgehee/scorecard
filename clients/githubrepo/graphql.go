@@ -289,3 +289,66 @@ func getRepoAssociation(association *string) *clients.RepoAssociation {
 	}
 	return &repoAssociaton
 }
+
+// nolint: govet
+type graphqlDataLastCommit struct {
+	Repository struct {
+		DefaultBranchRef struct {
+			Target struct {
+				Commit struct {
+					History struct {
+						Nodes []struct {
+							Oid githubv4.GitObjectID
+						}
+					} `graphql:"history(first: 1)"`
+				} `graphql:"... on Commit"`
+			} `graphql:"target"`
+		} `graphql:"defaultBranchRef"`
+	} `graphql:"repository(owner: $owner, name: $name)"`
+	RateLimit struct {
+		Cost *int
+	}
+}
+
+
+type GraphqlHandler2 struct {
+	client   *githubv4.Client
+	data     *graphqlDataLastCommit
+	once     *sync.Once
+	ctx      context.Context
+	errSetup error
+	repourl  *repoURL
+	LastCommitDefaultBranch string
+}
+
+func (handler *GraphqlHandler2) Init(ctx context.Context, repoOwner, repoName string) {
+	handler.ctx = ctx
+
+	handler.repourl = &repoURL{
+		owner:         repoOwner,
+		repo:          repoName,
+	}
+	handler.data = new(graphqlDataLastCommit)
+	handler.errSetup = nil
+	handler.once = new(sync.Once)
+}
+
+func (handler *GraphqlHandler2) Setup() error {
+	handler.once.Do(func() {
+		vars := map[string]interface{}{
+			"owner":                  githubv4.String(handler.repourl.owner),
+			"name":                   githubv4.String(handler.repourl.repo),
+		}
+		if err := handler.client.Query(handler.ctx, handler.data, vars); err != nil {
+			handler.errSetup = sce.WithMessage(sce.ErrScorecardInternal, fmt.Sprintf("githubv4.Query: %v", err))
+			return
+		}
+		historyNodes := handler.data.Repository.DefaultBranchRef.Target.Commit.History.Nodes
+		if len(historyNodes) >= 1 {
+			handler.LastCommitDefaultBranch = string(historyNodes[0].Oid)
+		} else {
+			handler.errSetup = sce.WithMessage(sce.ErrScorecardInternal, fmt.Sprintf("Empty commit list"))
+		}
+	})
+	return handler.errSetup
+}
