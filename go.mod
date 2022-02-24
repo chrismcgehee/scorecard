@@ -36,7 +36,7 @@ require (
 )
 
 require (
-	github.com/rhysd/actionlint v1.6.8
+	github.com/rhysd/actionlint v1.6.9
 	gotest.tools v2.2.0+incompatible
 )
 
